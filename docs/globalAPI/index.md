@@ -671,7 +671,7 @@ Vue.use = function (plugin) {
 }
 ```
 
-可以看到，在该函数内部，首先定义了一个变量`installedPlugins`,该变量初始值时一个空数组，用来存储已安装过的插件。首先判断传入的插件是否存在于`installedPlugins`数组中（即已被安装过），如果存在的话，则直接返回，防止重复安装。如下：
+可以看到，在该函数内部，首先定义了一个变量`installedPlugins`,该变量初始值是一个空数组，用来存储已安装过的插件。首先判断传入的插件是否存在于`installedPlugins`数组中（即已被安装过），如果存在的话，则直接返回，防止重复安装。如下：
 
 ```javascript
 const installedPlugins = (this._installedPlugins || (this._installedPlugins = []))

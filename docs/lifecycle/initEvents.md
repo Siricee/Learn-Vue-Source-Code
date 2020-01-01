@@ -271,7 +271,7 @@ export function updateListeners (
 
 可以看到，该函数的作用是对比`listeners`和`oldListeners`的不同，并调用参数中提供的`add`和`remove`进行相应的注册事件和卸载事件。其思想是：如果`listeners`对象中存在某个`key`（即事件名）而`oldListeners`中不存在，则说明这个事件是需要新增的；反之，如果`oldListeners`对象中存在某个`key`（即事件名）而`listeners`中不存在，则说明这个事件是需要从事件系统中卸载的；
 
-该函数接收5个参数，分别时`on`、`oldOn`、`add`、`remove`、`vm`，其中`on`对应`listeners`，`oldOn`对应`oldListeners`。
+该函数接收5个参数，分别是`on`、`oldOn`、`add`、`remove`、`vm`，其中`on`对应`listeners`，`oldOn`对应`oldListeners`。
 
 首先对`on`进行遍历， 获得每一个事件名，然后调用 `normalizeEvent` 函数（关于该函数下面会介绍）处理， 处理完事件名后， 判断事件名对应的值是否存在，如果不存在则抛出警告，如下：
 

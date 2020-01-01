@@ -12,6 +12,7 @@ import { extend, mergeOptions, formatComponentName } from '../util/index'
 
 let uid = 0
 
+/*initMixin就做了一件事情，在Vue的原型上增加_init方法，构造Vue实例的时候会调用这个_init方法来初始化Vue实例*/
 export function initMixin (Vue: Class<Component>) {
   Vue.prototype._init = function (options?: Object) {
     const vm: Component = this
@@ -49,23 +50,25 @@ export function initMixin (Vue: Class<Component>) {
     }
     // expose real self
     vm._self = vm
-    initLifecycle(vm)
-    initEvents(vm)
-    initRender(vm)
-    callHook(vm, 'beforeCreate')
+    initLifecycle(vm)      /*初始化生命周期*/
+    initEvents(vm)        /*初始化事件*/
+    initRender(vm)         /*初始化render*/
+    callHook(vm, 'beforeCreate')    /*调用beforeCreate钩子函数并且触发beforeCreate钩子事件*/
     initInjections(vm) // resolve injections before data/props
-    initState(vm)
+    initState(vm)    /*初始化props、methods、data、computed与watch*/
     initProvide(vm) // resolve provide after data/props
-    callHook(vm, 'created')
+    callHook(vm, 'created')         /*调用created钩子函数并且触发created钩子事件*/
 
     /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+      /*格式化组件名*/
       vm._name = formatComponentName(vm, false)
       mark(endTag)
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
 
     if (vm.$options.el) {
+      /*挂载组件*/
       vm.$mount(vm.$options.el)
     }
   }

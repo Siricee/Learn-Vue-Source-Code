@@ -31,16 +31,6 @@ module.exports = {
     docsDir: "docs",
 	editLinkText: '在 GitHub 上编辑此页',
 	lastUpdated: '上次更新',
-    nav: [
-      // {
-      //   text: '2.x 版本',
-      //   link: '/v2/prepare/'
-      // },
-      // {
-      //   text: '3.x 版本',
-      //   link: '/v3/guide/'
-      // },
-    ],
     sidebarDepth : 1,
     sidebar: [
       {
@@ -137,5 +127,17 @@ module.exports = {
         ]
       }
     ]
-  }
+  },
+  plugins: [
+    [
+      'vuepress-plugin-medium-zoom',
+      {
+        options: {
+          margin: 24,
+          background: 'white',
+          scrollOffset: 0,
+        },
+      },
+    ],
+  ]
 };

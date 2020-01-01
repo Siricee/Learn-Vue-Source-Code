@@ -9,6 +9,7 @@ type CompiledFunctionResult = {
   staticRenderFns: Array<Function>;
 };
 
+/*新建成Funtion对象*/
 function createFunction (code, errors) {
   try {
     return new Function(code)

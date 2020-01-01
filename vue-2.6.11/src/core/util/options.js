@@ -276,13 +276,16 @@ function checkComponents (options: Object) {
   }
 }
 
-export function validateComponentName (name: string) {
+//  检测name是否有效
+export function validateComponentName(name: string) {
+  /*name只能包含字母与连字符*/
   if (!new RegExp(`^[a-zA-Z][\\-\\.0-9_${unicodeRegExp.source}]*$`).test(name)) {
     warn(
       'Invalid component name: "' + name + '". Component names ' +
       'should conform to valid custom element name in html5 specification.'
     )
   }
+  // 不能是内置标签以及平台保留标签
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
     warn(
       'Do not use built-in or reserved HTML elements as component ' +

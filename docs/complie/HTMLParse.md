@@ -46,7 +46,7 @@ export function parse(template, options) {
 }
 ```
 
-从代码中我们可以看到，调用`parseHTML`函数时为其传入的两个参数分别时：
+从代码中我们可以看到，调用`parseHTML`函数时为其传入的两个参数分别是：
 
 - template:待转换的模板字符串；
 - options:转换时所需的选项；
@@ -161,7 +161,7 @@ if (comment.test(html)) {
 
 上面代码中有一处值得注意的地方，那就是我们平常在模板中可以在`<template></template>`标签上配置`comments`选项来决定在渲染模板时是否保留注释，对应到上面代码中就是`options.shouldKeepComment`,如果用户配置了`comments`选项为`true`，则`shouldKeepComment`为`true`，则创建注释类型的`AST`节点，如不保留注释，则将游标移动到'-->'之后，继续向后解析。
 
-`advance`函数时用来移动解析游标的，解析完一部分就把游标向后移动一部分，确保不会重复解析，其代码如下：
+`advance`函数是用来移动解析游标的，解析完一部分就把游标向后移动一部分，确保不会重复解析，其代码如下：
 
 ```javascript
 function advance (n) {
@@ -472,7 +472,7 @@ const value = args[3] || args[4] || args[5] || ''
 
 
 
-接着定义了`shouldDecodeNewlines`，这个常量主要时做一些兼容性处理， 如果 `shouldDecodeNewlines` 为 `true`，意味着 `Vue` 在编译模板的时候，要对属性值中的换行符或制表符做兼容处理。而`shouldDecodeNewlinesForHref`为`true` 意味着`Vue`在编译模板的时候，要对`a`标签的 `href `属性值中的换行符或制表符做兼容处理。
+接着定义了`shouldDecodeNewlines`，这个常量主要是做一些兼容性处理， 如果 `shouldDecodeNewlines` 为 `true`，意味着 `Vue` 在编译模板的时候，要对属性值中的换行符或制表符做兼容处理。而`shouldDecodeNewlinesForHref`为`true` 意味着`Vue`在编译模板的时候，要对`a`标签的 `href `属性值中的换行符或制表符做兼容处理。
 
 ```javascript
 const shouldDecodeNewlines = tagName === 'a' && args[1] === 'href'
@@ -498,7 +498,7 @@ if (!unary) {
 }
 ```
 
-如果该标签时自闭合标签，现在就可以调用`start`钩子函数并传入处理好的参数来创建`AST`节点了，如下：
+如果该标签是自闭合标签，现在就可以调用`start`钩子函数并传入处理好的参数来创建`AST`节点了，如下：
 
 ```javascript
 if (options.start) {

@@ -76,6 +76,7 @@ export default class Watcher {
       ? expOrFn.toString()
       : ''
     // parse expression for getter
+    /*把表达式expOrFn解析成getter*/
     if (typeof expOrFn === 'function') {
       this.getter = expOrFn
     } else {
@@ -98,6 +99,7 @@ export default class Watcher {
   /**
    * Evaluate the getter, and re-collect dependencies.
    */
+  /*获得getter的值并且重新进行依赖收集*/
   get () {
     pushTarget(this)
     let value
@@ -114,8 +116,10 @@ export default class Watcher {
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
       if (this.deep) {
+        /*递归每一个对象或者数组，触发它们的getter，使得对象或数组的每一个成员都被依赖收集，形成一个“深（deep）”依赖关系*/
         traverse(value)
       }
+      /*将观察者实例从target栈中取出并设置给Dep.target*/
       popTarget()
       this.cleanupDeps()
     }
@@ -125,6 +129,7 @@ export default class Watcher {
   /**
    * Add a dependency to this directive.
    */
+  /*添加一个依赖关系到Deps集合中*/
   addDep (dep: Dep) {
     const id = dep.id
     if (!this.newDepIds.has(id)) {
@@ -139,6 +144,7 @@ export default class Watcher {
   /**
    * Clean up for dependency collection.
    */
+  /*清理依赖收集*/
   cleanupDeps () {
     let i = this.deps.length
     while (i--) {
@@ -161,13 +167,16 @@ export default class Watcher {
    * Subscriber interface.
    * Will be called when a dependency changes.
    */
+  // 当依赖发生改变的时候触发回调。
   update () {
     /* istanbul ignore else */
     if (this.lazy) {
       this.dirty = true
     } else if (this.sync) {
+      /*同步则执行run直接渲染视图*/
       this.run()
     } else {
+      /*异步推送到观察者队列中，下一个tick时调用。*/
       queueWatcher(this)
     }
   }
@@ -178,17 +187,20 @@ export default class Watcher {
    */
   run () {
     if (this.active) {
+      /* get操作在获取value本身也会执行getter从而调用update更新视图 */
       const value = this.get()
       if (
         value !== this.value ||
         // Deep watchers and watchers on Object/Arrays should fire even
         // when the value is the same, because the value may
         // have mutated.
+        // 即便值相同，拥有Deep属性的观察者以及在对象／数组上的观察者应该被触发更新，因为它们的值可能发生改变。
         isObject(value) ||
         this.deep
       ) {
         // set new value
         const oldValue = this.value
+         /*设置新的值*/
         this.value = value
         if (this.user) {
           try {
@@ -207,6 +219,7 @@ export default class Watcher {
    * Evaluate the value of the watcher.
    * This only gets called for lazy watchers.
    */
+  /*获取观察者的值*/
   evaluate () {
     this.value = this.get()
     this.dirty = false
@@ -215,6 +228,7 @@ export default class Watcher {
   /**
    * Depend on all deps collected by this watcher.
    */
+  /*收集该watcher的所有deps依赖*/
   depend () {
     let i = this.deps.length
     while (i--) {
@@ -225,11 +239,13 @@ export default class Watcher {
   /**
    * Remove self from all dependencies' subscriber list.
    */
+  /*将自身从所有依赖收集订阅列表删除*/
   teardown () {
     if (this.active) {
       // remove self from vm's watcher list
       // this is a somewhat expensive operation so we skip it
       // if the vm is being destroyed.
+      /*从vm实例的观察者列表中将自身移除，由于该操作比较耗费资源，所以如果vm实例正在被销毁则跳过该步骤。*/
       if (!this.vm._isBeingDestroyed) {
         remove(this.vm._watchers, this)
       }

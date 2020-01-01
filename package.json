@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "vuepress dev docs",
     "build": "vuepress build docs",
-    "deploy": "sh build.sh"
+    "commit": "git cz",
+    "deploy": "sh deploy.sh"
   },
   "repository": {
     "type": "git",
@@ -16,8 +17,16 @@
   },
   "keywords": [],
   "author": "NLRX",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "vuepress": "^1.2.0"
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "^3.0.2",
+    "vuepress": "^1.2.0",
+    "vuepress-plugin-medium-zoom": "^1.1.8"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

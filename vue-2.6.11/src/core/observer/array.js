@@ -23,11 +23,18 @@ const methodsToPatch = [
 /**
  * Intercept mutating methods and emit events
  */
+/*
+  这里重写了数组的这些方法，
+  在保证不污染原生数组原型的情况下重写数组的这些方法，
+  截获数组的成员发生的变化，
+  执行原生数组操作的同时dep通知关联的所有观察者进行响应式处理
+*/
 methodsToPatch.forEach(function (method) {
   // cache original method
   const original = arrayProto[method]     // 缓存原生方法
   def(arrayMethods, method, function mutator (...args) {
-    const result = original.apply(this, args)
+    const result = original.apply(this, args)  /*调用原生的数组方法*/
+    /*数组新插入的元素需要重新进行observe才能响应式*/
     const ob = this.__ob__
     let inserted
     switch (method) {
@@ -41,6 +48,7 @@ methodsToPatch.forEach(function (method) {
     }
     if (inserted) ob.observeArray(inserted)
     // notify change
+    /*dep通知所有注册的观察者进行响应式处理*/
     ob.dep.notify()
     return result
   })

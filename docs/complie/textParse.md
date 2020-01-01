@@ -185,7 +185,7 @@ while ((match = tagRE.exec(text))) {
   }
 ```
 
-上面代码中，首先取得字符串中第一个变量在字符串中的起始位置赋给`index`，然后比较`index`和`lastIndex`的大小，此时你可能有疑问了，这个`lastIndex`是什么呢？在上面定义变量中，定义了`let lastIndex = tagRE.lastIndex = 0`,所以`lastIndex`就是`tagRE.lastIndex`，而`tagRE.lastIndex`又是什么呢？当调用`exec( )`的正则表达式对象具有修饰符g时，它将把当前正则表达式对象的`lastIndex`属性设置为紧挨着匹配子串的字符位置，当同一个正则表达式第二次调用`exec( )`，它会将从`lastIndex`属性所指示的字符串处开始检索，如果`exec( )`没有发现任何匹配结果，它会将`lastIndex`重置为0。示例如下：
+上面代码中，首先取得字符串中第一个变量在字符串中的起始位置赋给`index`，然后比较`index`和`lastIndex`的大小，此时你可能有疑问了，这个`lastIndex`是什么呢？在上面定义变量中，定义了`let lastIndex = tagRE.lastIndex = 0`,所以`lastIndex`就是`tagRE.lastIndex`，而`tagRE.lastIndex`又是什么呢？当调用`exec( )`的正则表达式对象具有修饰符`g`时，它将把当前正则表达式对象的`lastIndex`属性设置为紧挨着匹配子串的字符位置，当同一个正则表达式第二次调用`exec( )`，它会将从`lastIndex`属性所指示的字符串处开始检索，如果`exec( )`没有发现任何匹配结果，它会将`lastIndex`重置为0。示例如下：
 
 ```javascript
 const tagRE = /\{\{((?:.|\n)+?)\}\}/g

@@ -40,7 +40,7 @@ let car = {
 	})
 ```
 
-通过`Object.defineProperty() `方法给`car`定义了一个`price`属性，并把这个属性的读和写分别使用`get()`和`set()`进行拦截，每当该属性进行读或写操作的时候就会出发`get()`和`set()`。如下图：
+通过`Object.defineProperty() `方法给`car`定义了一个`price`属性，并把这个属性的读和写分别使用`get()`和`set()`进行拦截，每当该属性进行读或写操作的时候就会触发`get()`和`set()`。如下图：
 
 ![](~@/reactive/1.png)
 
@@ -82,8 +82,12 @@ export class Observer {
  * @param { Any } val 对象的某个key的值
  */
 function defineReactive (obj,key,val) {
+  // 如果只传了obj和key，那么val = obj[key]
+  if (arguments.length === 2) {
+    val = obj[key]
+  }
   if(typeof val === 'object'){
-      new Observable(val)
+      new Observer(val)
   }
   Object.defineProperty(obj, key, {
     enumerable: true,
@@ -116,7 +120,7 @@ function defineReactive (obj,key,val) {
 那么现在，我们就可以这样定义`car`:
 
 ```javascript
-let car = new Observable({
+let car = new Observer({
   'brand':'BMW',
   'price':3000
 })
@@ -163,7 +167,7 @@ export default class Dep {
   // 添加一个依赖
   depend () {
     if (window.target) {
-      this.addDep(window.target)
+      this.addSub(window.target)
     }
   }
   // 通知所有依赖更新
@@ -194,8 +198,11 @@ export function remove (arr, item) {
 
 ```javascript
 function defineReactive (obj,key,val) {
+  if (arguments.length === 2) {
+    val = obj[key]
+  }
   if(typeof val === 'object'){
-    new Observable(val)
+    new Observer(val)
   }
   const dep = new Dep()  //实例化一个依赖管理器，生成一个依赖管理数组dep
   Object.defineProperty(obj, key, {
@@ -246,7 +253,7 @@ export default class Watcher {
   update () {
     const oldValue = this.value
     this.value = this.get()
-    this.cb.call(this.vm, value, oldValue)
+    this.cb.call(this.vm, this.value, oldValue)
   }
 }
 
@@ -302,7 +309,7 @@ export function parsePath (path) {
 
 接着，我们学习了什么是依赖收集？并且知道了在`getter`中收集依赖，在`setter`中通知依赖更新，以及封装了依赖管理器`Dep`，用于存储收集到的依赖。
 
-最后，我们为每一个依赖都创建了一个`Wtcher`实例，当数据发生变化时，通知`Watcher`实例，由`Watcher`实例去做真实的更新操作。
+最后，我们为每一个依赖都创建了一个`Watcher`实例，当数据发生变化时，通知`Watcher`实例，由`Watcher`实例去做真实的更新操作。
 
 其整个流程大致如下：
 

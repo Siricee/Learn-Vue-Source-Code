@@ -224,7 +224,7 @@ if (!options.render) {
 }
 ```
 
-首先获取用户传入的`template`选项赋给变量`template`，如果变量`template`存在，则接着判断如果`template`是字符串并且以`##`开头，则认为`template`时`id`选择符，则调用`idToTemplate`函数获取到选择符对应的`DOM`元素的`innerHTML`作为模板，如下：
+首先获取用户传入的`template`选项赋给变量`template`，如果变量`template`存在，则接着判断如果`template`是字符串并且以`##`开头，则认为`template`是`id`选择符，则调用`idToTemplate`函数获取到选择符对应的`DOM`元素的`innerHTML`作为模板，如下：
 
 ```javascript
 if (template) {

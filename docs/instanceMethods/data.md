@@ -195,7 +195,7 @@ options.user = true
 const watcher = new Watcher(vm, expOrFn, cb, options)
 ```
 
-接着判断如果用户在选项参数`options`中指定的`immediate`为`true`，则立即用被观察数据当前的值出发回调，如下：
+接着判断如果用户在选项参数`options`中指定的`immediate`为`true`，则立即用被观察数据当前的值触发回调，如下：
 
 ```javascript
 if (options.immediate) {

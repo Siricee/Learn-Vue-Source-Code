@@ -31,7 +31,14 @@ import {
 export const emptyNode = new VNode('', {}, [])
 
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
-
+/*
+  判断两个VNode节点是否是同一个节点，需要满足以下条件
+  key相同
+  tag（当前节点的标签名）相同
+  isComment（是否为注释节点）相同
+  是否data（当前节点对应的对象，包含了具体的一些数据信息，是一个VNodeData类型，可以参考VNodeData类型中的数据信息）都有定义
+  当标签是<input>的时候，type必须相同
+*/
 function sameVnode (a, b) {
   return (
     a.key === b.key && (
@@ -49,6 +56,10 @@ function sameVnode (a, b) {
   )
 }
 
+/*
+  判断当标签是<input>的时候，type是否相同
+  某些浏览器不支持动态修改<input>类型，所以他们被视为不同类型
+*/
 function sameInputType (a, b) {
   if (a.tag !== 'input') return true
   let i
@@ -57,6 +68,11 @@ function sameInputType (a, b) {
   return typeA === typeB || isTextInputType(typeA) && isTextInputType(typeB)
 }
 
+/*
+  生成一个key与旧VNode的key对应的哈希表
+  比如childre是这样的 [{xx: xx, key: 'key0'}, {xx: xx, key: 'key1'}, {xx: xx, key: 'key2'}]  beginIdx = 0   endIdx = 2  
+  结果生成{key0: 0, key1: 1, key2: 2}
+*/
 function createKeyToOldIdx (children, beginIdx, endIdx) {
   let i, key
   const map = {}
@@ -67,6 +83,7 @@ function createKeyToOldIdx (children, beginIdx, endIdx) {
   return map
 }
 
+/*创建patch方法*/
 export function createPatchFunction (backend) {
   let i, j
   const cbs = {}
@@ -122,6 +139,7 @@ export function createPatchFunction (backend) {
 
   let creatingElmInVPre = 0
 
+  /*创建一个节点*/
   function createElm (
     vnode,
     insertedVnodeQueue,
@@ -139,8 +157,9 @@ export function createPatchFunction (backend) {
       // associated DOM element for it.
       vnode = ownerArray[index] = cloneVNode(vnode)
     }
-
+    /*insertedVnodeQueue为空数组[]的时候isRootInsert标志为true*/
     vnode.isRootInsert = !nested // for transition enter check
+    /*创建一个组件节点*/
     if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
       return
     }
@@ -207,6 +226,7 @@ export function createPatchFunction (backend) {
     }
   }
 
+  /*创建一个组件*/
   function createComponent (vnode, insertedVnodeQueue, parentElm, refElm) {
     let i = vnode.data
     if (isDef(i)) {
@@ -218,6 +238,11 @@ export function createPatchFunction (backend) {
       // it should've created a child instance and mounted it. the child
       // component also has set the placeholder vnode's elm.
       // in that case we can just return the element and be done.
+      /*
+        在调用了init钩子以后，如果VNode是一个子组件，它应该已经创建了一个子组件实例并挂载它。
+        子组件也应该设置了一个VNode占位符，我们直接返回组件实例即可。
+        意思就是如果已经存在组件实例，则不需要重新创建一个新的，我们要做的就是初始化组件以及激活组件即可，还是用原来的组件实例。
+      */
       if (isDef(vnode.componentInstance)) {
         initComponent(vnode, insertedVnodeQueue)
         insert(parentElm, vnode.elm, refElm)
@@ -315,6 +340,7 @@ export function createPatchFunction (backend) {
   // set scope id attribute for scoped CSS.
   // this is implemented as a special case to avoid the overhead
   // of going through the normal attribute patching process.
+  /*为scoped CSS 设置scoped id*/
   function setScope (vnode) {
     let i
     if (isDef(i = vnode.fnScopeId)) {
@@ -338,12 +364,14 @@ export function createPatchFunction (backend) {
     }
   }
 
+  /*添加节点*/
   function addVnodes (parentElm, refElm, vnodes, startIdx, endIdx, insertedVnodeQueue) {
     for (; startIdx <= endIdx; ++startIdx) {
       createElm(vnodes[startIdx], insertedVnodeQueue, parentElm, refElm, false, vnodes, startIdx)
     }
   }
 
+  /*调用销毁的钩子函数*/
   function invokeDestroyHook (vnode) {
     let i, j
     const data = vnode.data
@@ -358,14 +386,18 @@ export function createPatchFunction (backend) {
     }
   }
 
+  /*移除节点*/
   function removeVnodes (vnodes, startIdx, endIdx) {
     for (; startIdx <= endIdx; ++startIdx) {
       const ch = vnodes[startIdx]
       if (isDef(ch)) {
         if (isDef(ch.tag)) {
+          /*存在tag时*/
+          /*移除节点并调用remove钩子*/
           removeAndInvokeRemoveHook(ch)
           invokeDestroyHook(ch)
         } else { // Text node
+          /*不存在代表是一个text节点，直接移除*/
           removeNode(ch.elm)
         }
       }

@@ -52,25 +52,38 @@ export function generate (
   }
 }
 
+/*处理element，分别处理static静态节点、v-once、v-for、v-if、template、slot以及组件或元素*/
 export function genElement (el: ASTElement, state: CodegenState): string {
   if (el.parent) {
     el.pre = el.pre || el.parent.pre
   }
 
+  /*处理static静态节点*/
   if (el.staticRoot && !el.staticProcessed) {
     return genStatic(el, state)
-  } else if (el.once && !el.onceProcessed) {
+  }
+  /*处理v-once*/
+  else if (el.once && !el.onceProcessed) {
     return genOnce(el, state)
-  } else if (el.for && !el.forProcessed) {
+  }
+   /*处理v-for*/
+  else if (el.for && !el.forProcessed) {
     return genFor(el, state)
-  } else if (el.if && !el.ifProcessed) {
+  }
+  /*处理v-if*/
+  else if (el.if && !el.ifProcessed) {
     return genIf(el, state)
-  } else if (el.tag === 'template' && !el.slotTarget && !state.pre) {
+  }
+  /*处理template*/
+  else if (el.tag === 'template' && !el.slotTarget && !state.pre) {
     return genChildren(el, state) || 'void 0'
-  } else if (el.tag === 'slot') {
+  }
+  /*处理slot*/
+  else if (el.tag === 'slot') {
     return genSlot(el, state)
   } else {
     // component or element
+    /*处理组件或元素*/
     let code
     if (el.component) {
       code = genComponent(el.component, el, state)
@@ -96,7 +109,9 @@ export function genElement (el: ASTElement, state: CodegenState): string {
 }
 
 // hoist static sub-trees out
-function genStatic (el: ASTElement, state: CodegenState): string {
+/*处理static静态节点*/
+function genStatic(el: ASTElement, state: CodegenState): string {
+  /*处理过的标记位*/
   el.staticProcessed = true
   // Some elements (templates) need to behave differently inside of a v-pre
   // node.  All pre nodes are static roots, so we can use this as a location to
@@ -115,13 +130,20 @@ function genStatic (el: ASTElement, state: CodegenState): string {
 }
 
 // v-once
+/*处理v-once*/
 function genOnce (el: ASTElement, state: CodegenState): string {
-  el.onceProcessed = true
+  el.onceProcessed = true   /*处理过的标记位*/
+  /*同时还存在v-if的时候需要处理v-if*/
   if (el.if && !el.ifProcessed) {
     return genIf(el, state)
   } else if (el.staticInFor) {
+    /*
+      staticInFor标记static的或者有v-once指令同时处于for循环中的节点。
+      此时表示同时存在于for循环中
+    */
     let key = ''
     let parent = el.parent
+    /*向上逐级寻找所处的for循环*/
     while (parent) {
       if (parent.for) {
         key = parent.key
@@ -130,6 +152,7 @@ function genOnce (el: ASTElement, state: CodegenState): string {
       parent = parent.parent
     }
     if (!key) {
+      /*如果v-once出现在for循环中，那必须要给设置v-for的element设置key*/
       process.env.NODE_ENV !== 'production' && state.warn(
         `v-once can only be used inside v-for that is keyed. `,
         el.rawAttrsMap['v-once']
@@ -142,6 +165,7 @@ function genOnce (el: ASTElement, state: CodegenState): string {
   }
 }
 
+/*处理v-if*/
 export function genIf (
   el: any,
   state: CodegenState,
@@ -152,13 +176,16 @@ export function genIf (
   return genIfConditions(el.ifConditions.slice(), state, altGen, altEmpty)
 }
 
+/*处理if条件*/
 function genIfConditions (
   conditions: ASTIfConditions,
   state: CodegenState,
   altGen?: Function,
   altEmpty?: string
 ): string {
-  if (!conditions.length) {
+
+  /*表达式不存在*/
+  if (!conditions.length) {   
     return altEmpty || '_e()'
   }
 
@@ -174,6 +201,7 @@ function genIfConditions (
   }
 
   // v-if with v-once should generate code like (a)?_m(0):_m(1)
+   /*v-if与v-once同时存在的时候应该使用三元运算符，譬如说(a)?_m(0):_m(1)*/
   function genTernaryExp (el) {
     return altGen
       ? altGen(el, state)
@@ -183,6 +211,7 @@ function genIfConditions (
   }
 }
 
+/*处理v-for循环*/
 export function genFor (
   el: any,
   state: CodegenState,

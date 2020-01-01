@@ -2,8 +2,8 @@
 
 import { makeMap, isBuiltInTag, cached, no } from 'shared/util'
 
-let isStaticKey
-let isPlatformReservedTag
+let isStaticKey               /*标记是否为静态属性*/
+let isPlatformReservedTag     /*标记是否是平台保留的标签*/
 
 const genStaticKeysCached = cached(genStaticKeys)
 
@@ -18,9 +18,18 @@ const genStaticKeysCached = cached(genStaticKeys)
  *    create fresh nodes for them on each re-render;
  * 2. Completely skip them in the patching process.
  */
+/*
+  将AST树进行优化
+  优化的目标：生成模板AST树，检测不需要进行DOM改变的静态子树。
+  一旦检测到这些静态树，我们就能做以下这些事情：
+  1.把它们变成常数，这样我们就再也不需要每次重新渲染时创建新的节点了。
+  2.在patch的过程中直接跳过。
+ */
 export function optimize (root: ?ASTElement, options: CompilerOptions) {
   if (!root) return
+  /*标记是否为静态属性*/
   isStaticKey = genStaticKeysCached(options.staticKeys || '')
+  /*标记是否是平台保留的标签*/
   isPlatformReservedTag = options.isReservedTag || no
   // first pass: mark all non-static nodes.
   markStatic(root)
@@ -28,6 +37,7 @@ export function optimize (root: ?ASTElement, options: CompilerOptions) {
   markStaticRoots(root, false)
 }
 
+/*静态属性的map表*/
 function genStaticKeys (keys: string): Function {
   return makeMap(
     'type,tag,attrsList,attrsMap,plain,parent,children,attrs,start,end,rawAttrsMap' +
@@ -39,6 +49,7 @@ function markStatic (node: ASTNode) {
   node.static = isStatic(node)
   if (node.type === 1) {
     // do not make component slot content static. this avoids
+    // 不要使组件slot成为静态的，避免下面这两种情况：
     // 1. components not able to mutate slot nodes
     // 2. static slot content fails for hot-reloading
     if (
@@ -69,6 +80,7 @@ function markStatic (node: ASTNode) {
 
 function markStaticRoots (node: ASTNode, isInFor: boolean) {
   if (node.type === 1) {
+    /*标记static的或者有v-once指令同时处于for循环中的节点*/
     if (node.static || node.once) {
       node.staticInFor = isInFor
     }
@@ -85,11 +97,17 @@ function markStaticRoots (node: ASTNode, isInFor: boolean) {
     } else {
       node.staticRoot = false
     }
+    /*遍历子节点*/
     if (node.children) {
       for (let i = 0, l = node.children.length; i < l; i++) {
         markStaticRoots(node.children[i], isInFor || !!node.for)
       }
     }
+    /*
+      ifConditions存储了if条件。
+      是一个数组，格式为[{exp: xxx, block:xxx}, {exp: xxx, block:xxx}, {exp: xxx, block:xxx}]
+      block存储了element，exp存储了表达式。
+    */
     if (node.ifConditions) {
       for (let i = 1, l = node.ifConditions.length; i < l; i++) {
         markStaticRoots(node.ifConditions[i].block, isInFor)
@@ -98,6 +116,7 @@ function markStaticRoots (node: ASTNode, isInFor: boolean) {
   }
 }
 
+/*判断一个node节点是否是static的*/
 function isStatic (node: ASTNode): boolean {
   if (node.type === 2) { // 包含变量的动态文本节点
     return false

@@ -1051,7 +1051,7 @@ export function defineComputed (target,key,userDef) {
 
 ```
 
-该函数接受3个参数，分别是：`target`、`key`和`userDef`。其作用时为`target`上定义一个属性`key`，并且属性`key`的`getter`和`setter`根据`userDef`的值来设置。下面我们就来看一下该函数的具体逻辑。
+该函数接受3个参数，分别是：`target`、`key`和`userDef`。其作用是为`target`上定义一个属性`key`，并且属性`key`的`getter`和`setter`根据`userDef`的值来设置。下面我们就来看一下该函数的具体逻辑。
 
 首先定义了变量`sharedPropertyDefinition`，它是一个默认的属性描述符。
 
